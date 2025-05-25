@@ -1,47 +1,47 @@
-import { useState, useEffect } from "react";
-import "./App.css";
-import abonents from "./abonents.json";
+import { useSelector, useDispatch } from "react-redux";
+import { addContact, deleteContact } from "../redux/ContactsSlice";
+import { changeFilter } from "../redux/FiltersSlice";
+
+import ContactForm from "./contactForm/ContactForm";
 import ContactList from "./contactList/ContactList";
 import SearchBox from "./searchBox/SearchBox";
-import ContactForm from "./contactForm/ContactForm";
 
 function App() {
-  const [inputValue, setInputValue] = useState("");
-  const [contacts, setContacts] = useState(() => {
-    const savedCont = localStorage.getItem("savedContactList");
-    if (savedCont !== null) {
-      return JSON.parse(savedCont);
-    }
-    return abonents;
-  });
+  const dispatch = useDispatch();
 
-  useEffect(
-    () => localStorage.setItem("savedContactList", JSON.stringify(contacts)),
-    [contacts]
+  // Дістаємо стан із Redux
+  const contacts = useSelector((state) => state.contacts.items);
+  const filter = useSelector((state) => state.filters.name);
+
+  // Фільтрація контактів
+  const filteredContacts = contacts.filter((contact) =>
+    contact.name.toLowerCase().includes(filter.toLowerCase())
   );
 
-  const filteredAbonent = contacts.filter((abonent) =>
-    abonent.name.toLowerCase().includes(inputValue.toLowerCase())
-  );
-
-  const addNewContact = (newContacts) => {
-    setContacts((prevContacts) => {
-      return [...prevContacts, newContacts];
-    });
+  // Додавання контакту
+  const handleAddContact = (newContact) => {
+    dispatch(addContact(newContact));
   };
 
-  const deleteContact = (id) => {
-    setContacts((prevContacts) => {
-      return prevContacts.filter((contact) => contact.id !== id);
-    });
+  // Видалення контакту
+  const handleDeleteContact = (id) => {
+    dispatch(deleteContact(id));
+  };
+
+  // Зміна фільтра
+  const handleChangeFilter = (value) => {
+    dispatch(changeFilter(value));
   };
 
   return (
     <div>
       <h1>Phonebook</h1>
-      <ContactForm onSubmit={addNewContact} />
-      <SearchBox inputValue={inputValue} setInputValue={setInputValue} />
-      <ContactList abonents={filteredAbonent} deleteContact={deleteContact} />
+      <ContactForm onSubmit={handleAddContact} />
+      <SearchBox inputValue={filter} setInputValue={handleChangeFilter} />
+      <ContactList
+        abonents={filteredContacts}
+        deleteContact={handleDeleteContact}
+      />
     </div>
   );
 }
