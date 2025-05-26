@@ -2,6 +2,8 @@ import { Field, Formik, Form, ErrorMessage } from "formik";
 import { nanoid } from "nanoid";
 import { object, string } from "yup";
 import css from "./ContactForm.module.css";
+import { useDispatch } from "react-redux";
+import { addContact } from "../../redux/ContactsSlice";
 
 const personSchema = object().shape({
   username: string().min(3, "To short").max(50, "To long").required("Required"),
@@ -12,14 +14,17 @@ const personSchema = object().shape({
     .required("Required"),
 });
 
-const ContactForm = ({ onSubmit }) => {
+const ContactForm = () => {
+  const dispatch = useDispatch();
   const handleSubmit = (values, actions) => {
-    console.log(values);
-    onSubmit({
-      id: nanoid(),
-      name: values.username,
-      number: values.number,
-    });
+    dispatch(
+      addContact({
+        id: nanoid(),
+        name: values.username,
+        number: values.number,
+      })
+    );
+
     actions.resetForm();
   };
 

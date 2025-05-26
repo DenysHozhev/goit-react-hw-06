@@ -1,8 +1,17 @@
 import { IoMdContact } from "react-icons/io";
 import { FaPhone } from "react-icons/fa6";
-import css from "./Contact.module.css";
+import { useDispatch } from "react-redux";
 
-const Contact = ({ data: { id, name, number }, deleteContact }) => {
+import css from "./Contact.module.css";
+import { deleteContact } from "../../redux/contactsSlice";
+
+const Contact = ({ data: { id, name, number } }) => {
+  const dispatch = useDispatch();
+
+  const handleDelete = () => {
+    dispatch(deleteContact(id));
+  };
+
   return (
     <div className={css.container}>
       <div className={css.list}>
@@ -13,7 +22,7 @@ const Contact = ({ data: { id, name, number }, deleteContact }) => {
           <FaPhone /> {number}
         </p>
       </div>
-      <button onClick={() => deleteContact(id)}>Delete</button>
+      <button onClick={handleDelete}>Delete</button>
     </div>
   );
 };
